@@ -1,0 +1,33 @@
+name: Build
+on: push
+
+env:
+  AWS_ROLE_ARN: arn:aws:iam::865422985541:role/GithubRole
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: translate-role-session
+          aws-region: ap-northeast-1
+      - run: aws sts get-caller-identity
+      
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@473e4d8fe5dd94ee328fdfca9f8c9c7afc9dae5e
+        with:
+          ruby-version: 3.0
+          bundler-cache: false
+      
+      - run: bundle install
+      
+      - name: Run app.rb
+        run: ruby app.rb
