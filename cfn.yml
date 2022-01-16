@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "IAM Role for GHA"
+
+Parameters:
+  GitHubOwner:
+    Type: String
+    Default: jacoyutorius
+  GitHubRepository:
+    Type: String
+    Default: csv_translator
+
+Resources:
+  OidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GithubRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Ref OidcProvider
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  - !Sub "repo:${GitHubOwner}/${GitHubRepository}:*"
+
+  Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: policy-amazon-translate
+      Roles:
+       - !Ref Role
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'translate:TranslateText'
+            Resource: '*'
+
+Outputs:
+  Role:
+    Value: !GetAtt Role.Arn
