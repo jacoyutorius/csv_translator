@@ -1,14 +1,4 @@
 require 'aws-sdk-translate'
-# require 'open-uri'
-# require 'csv'
-
-# csv_url = ARGV.shift
-# target_columns = ARGV.map(&:to_i)
-# csv = CSV.table(URI.open(csv_url), headers: false, row_sep: "\r\n")
-
-# csv.each do |row|
-#   p target_columns.inject("") {|str, i| str += row[i].to_s + "|" }
-# end
 
 class CsvTranslator
   require 'open-uri'
@@ -20,19 +10,22 @@ class CsvTranslator
     @target_columns = target_columns
   end
 
-  def run!(target_language_code='en')
-    write_csv("#{target_language_code}.csv", generate_translated_data)
+  def run!(source_language_code, target_language_code)
+    filename = "#{target_language_code}.csv",
+    write_csv(filename, generate_translated_data(source_language_code, target_language_code))
+    filename
   end
 
   private
 
-  def generate_translated_data
-    csv.map do |row|
-      text = @target_columns.inject("") {|str, i| str += row[i].to_s + '|' }
-      translateTextResponse = translate_text(text)
-      translated = translateTextResponse.translated_text.split('|')
+  SEPARATOR = '|'
 
-      # ar_en = row.dup
+  def generate_translated_data(source_language_code, target_language_code)
+    csv.map do |row|
+      text = @target_columns.inject("") {|str, i| str += row[i].to_s + SEPARATOR }
+      translateTextResponse = translate_text(text, source_language_code, target_language_code)
+      translated = translateTextResponse.translated_text.split(SEPARATOR)
+
       @target_columns.each do |i|
         row[i] = translated.shift
       end
@@ -57,11 +50,11 @@ class CsvTranslator
     @aws_client ||= Aws::Translate::Client.new
   end
 
-  def translate_text(text, source_language_code='ja', target_language_code='en')
+  def translate_text(text, source_language_code, target_language_code)
     aws_client.translate_text({
       text: text,
-      source_language_code: "ja",
-      target_language_code: "en",
+      source_language_code: source_language_code,
+      target_language_code: target_language_code,
     })
   end
 end
@@ -69,4 +62,4 @@ end
 csv_url = ARGV.shift
 target_columns = ARGV.map(&:to_i)
 translator = CsvTranslator.new(csv_url, target_columns)
-p translator.run!
+p translator.run!('ja', 'en')

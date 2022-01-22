@@ -12,6 +12,8 @@ CloudFormationにて`cfn.yml` を実行することで上記リソースを作�
 
 ## setup
 
+Amazon Translateを利用するため、`aws configure` を実行してAWS認証情報の設定をする。
+
 ```
 $ bundle
 $ aws configure
