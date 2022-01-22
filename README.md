@@ -22,5 +22,5 @@ $ aws configure
 ## usage
 
 ```
-$ ruby app.rb https://cio.go.jp/sites/default/files/uploads/documents/VaccinecertFAQ.csv 1 3 4 5
+$ ruby app.rb https://jacoyutorius-assets.s3.ap-northeast-1.amazonaws.com/public/sample.csv 1 3 4 5
 ```

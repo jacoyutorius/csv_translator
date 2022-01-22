@@ -29,5 +29,8 @@ jobs:
       
       - run: bundle install
       
+      - name: Run rubocop
+        run: rubocop
+
       - name: Run app.rb
         run: ruby app.rb
