@@ -1,5 +1,7 @@
 # CSV Translator
 
+[![Build](https://github.com/jacoyutorius/csv_translator/actions/workflows/aws.yml/badge.svg)](https://github.com/jacoyutorius/csv_translator/actions/workflows/aws.yml)
+
 GithubActionsのワークフロー内でAWS SDKを利用するRubyのコードを実行するサンプル。
 
 GithubActionsを実行する前に以下のAWSリソースを作成する必要がある。
